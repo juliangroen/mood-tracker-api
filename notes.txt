@@ -1,0 +1,26 @@
+Day
+    - General Mood
+        - Ecstatic
+        - Happy
+        - Neutral
+        - Sad
+        - Distraught
+    - Sleep Quality
+        - High Quality
+        - Solid
+        - Average
+        - Poor
+        - No Sleep
+    - Anxiety Level
+        - Extreme
+        - High
+        - Medium
+        - Low
+        - None
+    - Depression Level
+        - Extreme
+        - High
+        - Medium
+        - Low
+        - None
+    
