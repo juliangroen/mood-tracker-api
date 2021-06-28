@@ -17,15 +17,8 @@ db.connect((err) => {
 
 const app = express();
 
-// Create table
-app.get('/createtable', (req, res) => {
-    let sql =
-        'CREATE TABLE tests(id int AUTO_INCREMENT, value VARCHAR(255), PRIMARY KEY (id))';
-    db.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log(result);
-        res.send('Table was created!');
-    });
+app.get(['/', '/api'], (req, res) => {
+    res.send('👽');
 });
 
 // Insert row
@@ -40,8 +33,8 @@ app.get('/createtable', (req, res) => {
 //});
 
 //Select all rows
-app.get('/tests', (req, res) => {
-    let sql = 'SELECT * FROM tests';
+app.get('/api/entries', (req, res) => {
+    let sql = 'SELECT * FROM entries';
     let query = db.query(sql, (err, result) => {
         if (err) throw err;
         console.log(result);
@@ -49,14 +42,29 @@ app.get('/tests', (req, res) => {
     });
 });
 
-//Select specific row
-app.get('/tests/:id', (req, res) => {
-    let sql = `SELECT * FROM tests WHERE id = ${req.params.id}`;
+//Select specific row by id
+app.get('/api/entries/:id', (req, res) => {
+    let sql = `SELECT * FROM entries WHERE id = "${req.params.id}"`;
     let query = db.query(sql, (err, result) => {
         if (err) throw err;
         console.log(result);
         res.send(result);
     });
+});
+
+//Select rows with specified mood value
+
+app.get('/api/entries/mood/:mood', (req, res) => {
+    let sql = `SELECT * FROM entries WHERE mood = "${req.params.mood}"`;
+    let query = db.query(sql, (err, result) => {
+        if (err) throw err;
+        console.log(result);
+        res.send(result);
+    });
+});
+
+app.get('/api/hb', (req, res) => {
+    res.send('❤️🍯🐰');
 });
 
 app.listen('3000', () => {

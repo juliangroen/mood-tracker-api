@@ -1,0 +1,15 @@
+CREATE DATABASE mood_tracker;
+
+CREATE TABLE entries (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    mood INT NOT NULL,
+    sleep INT NOT NULL,
+    anxiety INT NOT NULL,
+    depression INT NOT NULL,
+    motivation INT NOT NULL,
+    focus INT NOT NULL
+);
+
+INSERT INTO entries VALUES(default, default, default, 1, 1, 1, 1, 1, 1);

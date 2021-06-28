@@ -1,4 +1,6 @@
-Day
+Entry
+    - Date and Time
+        - Universal Time (UTC)
     - General Mood
         - Ecstatic
         - Happy
@@ -11,16 +13,27 @@ Day
         - Average
         - Poor
         - No Sleep
-    - Anxiety Level
-        - Extreme
-        - High
-        - Medium
-        - Low
-        - None
-    - Depression Level
-        - Extreme
-        - High
-        - Medium
-        - Low
-        - None
-    
+    - Motivation
+        - Intense
+        - Efficient
+        - Productive
+        - Apathetic
+        - Counterproductive
+    - Anxiety
+        - Hysterical
+        - Panicked
+        - Uncomfortable
+        - Worried
+        - Balanced
+    - Depression
+        - Despair
+        - Hopeless
+        - Dismal
+        - Down
+        - Balanced
+    - Focus
+        - Fixated
+        - Concentrated
+        - Engaged
+        - Distracted
+        - Scattered
