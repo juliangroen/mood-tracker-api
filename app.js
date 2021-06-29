@@ -1,4 +1,5 @@
 const express = require('express');
+const { check, validationResult, query } = require('express-validator');
 const mysql = require('mysql');
 
 // Create connection to database
@@ -14,8 +15,9 @@ db.connect((err) => {
     if (err) throw err;
 });
 
+//Setup express app/router
 const app = express();
-
+app.use(express.json());
 app.set('query parser', 'simple');
 
 //*############//
@@ -38,23 +40,18 @@ app.get('/api/entries', (req, res) => {
     });
 });
 
-// Get entries containing one or more key value pairs via query string
-app.get('/api/entries/q', (req, res) => {
+//Query entries using query string values
+//Values sanitized using query wildcard and INT conversion
+app.get('/api/entries/q', query('*').toInt(), (req, res) => {
     const queryParams = Object.entries(req.query);
-    let sqlParams = ``;
-    queryParams.map(([key, value], index) => {
-        const safeKey = key.trim().split(' ', 1);
-
-        // ternary to check if value is an array due to duplicate query string keys
-        const safeValue = Array.isArray(value)
-            ? Number(value[0].trim().split(' ', 1))
-            : Number(value.trim().split(' ', 1));
-
-        sqlParams += `${safeKey} = ${safeValue}`;
-        if (index != queryParams.length - 1) {
-            sqlParams += ` AND `;
-        }
-    });
+    let sqlParams = queryParams
+        .map(([key, value], index) => {
+            if (index != queryParams.length - 1) {
+                return `${key} = ${value} AND`;
+            }
+            return `${key} = ${value}`;
+        })
+        .join(' ');
     let sql = `SELECT * FROM entries WHERE ${sqlParams};`;
     console.log(sql);
     db.query(sql, (err, result) => {
