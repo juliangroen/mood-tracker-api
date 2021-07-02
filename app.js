@@ -1,5 +1,4 @@
 const express = require('express');
-const { check, validationResult, query } = require('express-validator');
 const mysql = require('mysql');
 
 // Create connection to database
@@ -13,6 +12,7 @@ const db = mysql.createConnection({
 // Connect to database
 db.connect((err) => {
     if (err) throw err;
+    console.log('Database Connected!');
 });
 
 //Setup express app/router
@@ -41,19 +41,20 @@ app.get('/api/entries', (req, res) => {
 });
 
 //Query entries using query string values
-//Values sanitized using query wildcard and INT conversion
-app.get('/api/entries/q', query('*').toInt(), (req, res) => {
+//Keys and values escaped using node mysql package .format() method.
+app.get('/api/entries/q', (req, res) => {
+    //convert query string object to array
     const queryParams = Object.entries(req.query);
-    let sqlParams = queryParams
-        .map(([key, value], index) => {
-            if (index != queryParams.length - 1) {
-                return `${key} = ${value} AND`;
-            }
-            return `${key} = ${value}`;
-        })
-        .join(' ');
-    let sql = `SELECT * FROM entries WHERE ${sqlParams};`;
-    console.log(sql);
+
+    //append placeholders for each key value pair and then slice off the last "AND"
+    const placeholders = '?? = ? AND '.repeat(queryParams.length).slice(0, -5);
+
+    //built in .format() escapes keys with .escapeId() and values with .escape()
+    const sql = db.format(
+        `SELECT * FROM entries WHERE ${placeholders}`,
+        queryParams.flat()
+    );
+
     db.query(sql, (err, result) => {
         if (err) {
             return res.send([{ error: err.code }]);
@@ -61,6 +62,29 @@ app.get('/api/entries/q', query('*').toInt(), (req, res) => {
         return res.send(result);
     });
 });
+
+//app.get('/api/entries/q', (req, res) => {
+//    const queryParams = Object.entries(req.query);
+//    let sqlParams = queryParams
+//        .map(([key, value], index) => {
+//            const safeKey = db.escapeId(key);
+//            const safeValue = db.escape(value);
+//            //const safeValue = Number(value.trim());
+//            if (index != queryParams.length - 1) {
+//                return `${safeKey} = ${safeValue} AND`;
+//            }
+//            return `${safeKey} = ${safeValue}`;
+//        })
+//        .join(' ');
+//    let sql = `SELECT * FROM entries WHERE ${sqlParams};`;
+//    console.log(sql);
+//    db.query(sql, (err, result) => {
+//        if (err) {
+//            return res.send([{ error: err.code }]);
+//        }
+//        return res.send(result);
+//    });
+//});
 
 app.get('/api/hb', (req, res) => {
     return res.send('❤️🍯🐰');
