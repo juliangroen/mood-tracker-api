@@ -26,7 +26,7 @@ app.set('query parser', 'simple');
 
 //Default Route
 app.get(['/', '/api'], (req, res) => {
-    return res.send('👽');
+    return res.status(200).send('👽');
 });
 
 //Select all rows
@@ -34,9 +34,9 @@ app.get('/api/entries', (req, res) => {
     let sql = 'SELECT * FROM entries';
     db.query(sql, (err, result) => {
         if (err) {
-            return res.send([{ error: err.code }]);
+            return res.status(400).send([{ error: err.code }]);
         }
-        return res.send(result);
+        return res.status(200).send(result);
     });
 });
 
@@ -57,9 +57,9 @@ app.get('/api/entries/q', (req, res) => {
 
     db.query(sql, (err, result) => {
         if (err) {
-            return res.send([{ error: err.code }]);
+            return res.status(400).send([{ error: err.code }]);
         }
-        return res.send(result);
+        return res.status(200).send(result);
     });
 });
 
@@ -87,7 +87,7 @@ app.get('/api/entries/q', (req, res) => {
 //});
 
 app.get('/api/hb', (req, res) => {
-    return res.send('❤️🍯🐰');
+    return res.status(200).send('❤️🍯🐰');
 });
 
 //*#############//
