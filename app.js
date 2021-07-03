@@ -34,7 +34,9 @@ app.get('/api/entries', (req, res) => {
     let sql = 'SELECT * FROM entries';
     db.query(sql, (err, result) => {
         if (err) {
-            return res.status(400).send([{ error: err.code }]);
+            return res.status(400).send({
+                error: { error_num: err.errno, error_code: err.code },
+            });
         }
         return res.status(200).send(result);
     });
@@ -43,13 +45,12 @@ app.get('/api/entries', (req, res) => {
 //Query entries using query string values
 //Keys and values escaped using node mysql package .format() method.
 app.get('/api/entries/q', (req, res) => {
-    //convert query string object to array
     const queryParams = Object.entries(req.query);
 
     //append placeholders for each key value pair and then slice off the last "AND"
     const placeholders = '?? = ? AND '.repeat(queryParams.length).slice(0, -5);
 
-    //built in .format() escapes keys with .escapeId() and values with .escape()
+    //using mysql module's .format() which uses .escapeId() for keys and .escape() for values
     const sql = db.format(
         `SELECT * FROM entries WHERE ${placeholders}`,
         queryParams.flat()
@@ -57,7 +58,9 @@ app.get('/api/entries/q', (req, res) => {
 
     db.query(sql, (err, result) => {
         if (err) {
-            return res.status(400).send([{ error: err.code }]);
+            return res.status(400).send({
+                error: { error_num: err.errno, error_code: err.code },
+            });
         }
         return res.status(200).send(result);
     });
