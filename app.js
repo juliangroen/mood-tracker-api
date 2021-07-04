@@ -42,6 +42,19 @@ app.get('/api/entries', (req, res) => {
     });
 });
 
+//Return all rows from entries table
+app.get('/api/entries/:id', (req, res) => {
+    let sql = `SELECT * FROM entries WHERE id = ?`;
+    db.query(sql, req.params.id, (err, result) => {
+        if (err) {
+            return res.status(400).send({
+                error: { error_num: err.errno, error_code: err.code },
+            });
+        }
+        return res.status(200).send(result);
+    });
+});
+
 //Query entries using query string values
 //Keys and values escaped using node mysql package .format() method.
 app.get('/api/entries/q', (req, res) => {
@@ -75,19 +88,38 @@ app.get('/api/hb', (req, res) => {
 //*#############//
 
 // Insert a new entry into the entries table
-// values are expected as a JSON object via the req.body
+// values are expected as a JSON object via the req.body and auto escaped within the mysql.query() function
 app.post('/api/entries', (req, res) => {
     const sql = `INSERT INTO entries SET ?`;
     const query = db.query(sql, req.body, (err, result) => {
-        console.log(query.sql);
         if (err) {
             return res.status(400).send({
-                error: { erro_num: err.errno, error_code: err.code },
+                error: { error_num: err.errno, error_code: err.code },
             });
         }
         return res.status(200).send(result);
     });
 });
+
+//*############//
+//* PUT ROUTES //
+//*############//
+
+// Update an entry in the entries table by id number
+// values are expected as a JSON object via the req.body and auto escaped within the mysql.query() function
+app.post('/api/entries/:id', (req, res) => {
+    const sql = `UPDATE entries SET ? WHERE id = ?`;
+    const query = db.query(sql, [req.body, req.params.id], (err, result) => {
+        if (err) {
+            return res.status(400).send({
+                error: { error_num: err.errno, error_code: err.code },
+            });
+        }
+        return res.status(200).send(result);
+    });
+});
+
+//* START SERVER//
 
 app.listen('3000', () => {
     console.log('Server started on port 3000');
