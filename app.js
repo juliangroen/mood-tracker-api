@@ -15,7 +15,7 @@ db.connect((err) => {
     console.log('Database Connected!');
 });
 
-//Setup express app/router
+//Setup express router with middleware
 const app = express();
 app.use(express.json());
 app.set('query parser', 'simple');
@@ -110,6 +110,25 @@ app.post('/api/entries', (req, res) => {
 app.post('/api/entries/id/:id', (req, res) => {
     const sql = `UPDATE entries SET ? WHERE id = ?`;
     const query = db.query(sql, [req.body, req.params.id], (err, result) => {
+        if (err) {
+            return res.status(400).send({
+                error: { error_num: err.errno, error_code: err.code },
+            });
+        }
+        return res.status(200).send(result);
+    });
+});
+
+//*###############//
+//* DELETE ROUTES //
+//*###############//
+
+// Delete an entry in the entries table by id number
+// id value escaped via the mysql.query() function
+
+app.delete('/api/entries/id/:id', (req, res) => {
+    const sql = `DELETE FROM entries WHERE id = ?`;
+    const query = db.query(sql, req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
