@@ -32,7 +32,7 @@ app.get(['/', '/api'], (req, res) => {
 //Return all rows from entries table
 app.get('/api/entries', (req, res) => {
     let sql = 'SELECT * FROM entries';
-    db.query(sql, (err, result) => {
+    const query = db.query(sql, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -43,9 +43,9 @@ app.get('/api/entries', (req, res) => {
 });
 
 //Return all rows from entries table
-app.get('/api/entries/:id', (req, res) => {
+app.get('/api/entries/id/:id', (req, res) => {
     let sql = `SELECT * FROM entries WHERE id = ?`;
-    db.query(sql, req.params.id, (err, result) => {
+    const query = db.query(sql, req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -69,7 +69,7 @@ app.get('/api/entries/q', (req, res) => {
         queryParams.flat()
     );
 
-    db.query(sql, (err, result) => {
+    const query = db.query(sql, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -107,7 +107,7 @@ app.post('/api/entries', (req, res) => {
 
 // Update an entry in the entries table by id number
 // values are expected as a JSON object via the req.body and auto escaped within the mysql.query() function
-app.post('/api/entries/:id', (req, res) => {
+app.post('/api/entries/id/:id', (req, res) => {
     const sql = `UPDATE entries SET ? WHERE id = ?`;
     const query = db.query(sql, [req.body, req.params.id], (err, result) => {
         if (err) {
@@ -119,7 +119,9 @@ app.post('/api/entries/:id', (req, res) => {
     });
 });
 
-//* START SERVER//
+//*##############//
+//* START SERVER //
+//*##############//
 
 app.listen('3000', () => {
     console.log('Server started on port 3000');
