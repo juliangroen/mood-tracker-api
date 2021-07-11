@@ -2,7 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 
 // Create connection to database
-const db = mysql.createConnection({
+const db = mysql.createPool({
+    connectionLimit: 10,
     host: '::1',
     user: 'root',
     password: 'root',
@@ -10,10 +11,10 @@ const db = mysql.createConnection({
 });
 
 // Connect to database
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Database Connected!');
-});
+//db.getConnection((err) => {
+//    if (err) throw err;
+//    console.log('Database Connected!');
+//});
 
 //Setup express router with middleware
 const app = express();
@@ -64,7 +65,7 @@ app.get('/api/entries/q', (req, res) => {
     const placeholders = '?? = ? AND '.repeat(queryParams.length).slice(0, -5);
 
     //using mysql module's .format() which uses .escapeId() for keys and .escape() for values
-    const sql = db.format(
+    const sql = mysql.format(
         `SELECT * FROM entries WHERE ${placeholders}`,
         queryParams.flat()
     );
