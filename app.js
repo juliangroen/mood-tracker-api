@@ -26,7 +26,7 @@ app.get(['/', '/api'], (req, res) => {
 
 //Return all rows from entries table
 app.get('/api/entries', (req, res) => {
-    let sql = 'SELECT * FROM entries';
+    const sql = 'SELECT * FROM entries';
     const query = pool.query(sql, (err, result) => {
         if (err) {
             return res.status(400).send({
@@ -39,7 +39,7 @@ app.get('/api/entries', (req, res) => {
 
 //Return all rows from entries table
 app.get('/api/entries/id/:id', (req, res) => {
-    let sql = `SELECT * FROM entries WHERE id = ?`;
+    const sql = `SELECT * FROM entries WHERE id = ?`;
     const query = pool.query(sql, req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({
