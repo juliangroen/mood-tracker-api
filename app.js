@@ -2,17 +2,12 @@ const express = require('express');
 const mysql = require('mysql');
 
 // Create connection to database
-const db = mysql.createConnection({
-    host: '::1',
-    user: 'root',
-    password: 'root',
-    database: 'testdb',
-});
-
-// Connect to database
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Database Connected!');
+const pool = mysql.createPool({
+    connectionLimit: 10,
+    host: process.env.MYSQL_HOST || '::1',
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASS || 'root',
+    database: process.env.MYSQL_DBNAME || 'testdb',
 });
 
 //Setup express router with middleware
@@ -31,8 +26,8 @@ app.get(['/', '/api'], (req, res) => {
 
 //Return all rows from entries table
 app.get('/api/entries', (req, res) => {
-    let sql = 'SELECT * FROM entries';
-    const query = db.query(sql, (err, result) => {
+    const sql = 'SELECT * FROM entries';
+    const query = pool.query(sql, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -44,8 +39,8 @@ app.get('/api/entries', (req, res) => {
 
 //Return all rows from entries table
 app.get('/api/entries/id/:id', (req, res) => {
-    let sql = `SELECT * FROM entries WHERE id = ?`;
-    const query = db.query(sql, req.params.id, (err, result) => {
+    const sql = `SELECT * FROM entries WHERE id = ?`;
+    const query = pool.query(sql, req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -64,12 +59,12 @@ app.get('/api/entries/q', (req, res) => {
     const placeholders = '?? = ? AND '.repeat(queryParams.length).slice(0, -5);
 
     //using mysql module's .format() which uses .escapeId() for keys and .escape() for values
-    const sql = db.format(
+    const sql = mysql.format(
         `SELECT * FROM entries WHERE ${placeholders}`,
         queryParams.flat()
     );
 
-    const query = db.query(sql, (err, result) => {
+    const query = pool.query(sql, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -91,7 +86,7 @@ app.get('/api/hb', (req, res) => {
 // values are expected as a JSON object via the req.body and auto escaped within the mysql.query() function
 app.post('/api/entries', (req, res) => {
     const sql = `INSERT INTO entries SET ?`;
-    const query = db.query(sql, req.body, (err, result) => {
+    const query = pool.query(sql, req.body, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -109,7 +104,7 @@ app.post('/api/entries', (req, res) => {
 // values are expected as a JSON object via the req.body and auto escaped within the mysql.query() function
 app.post('/api/entries/id/:id', (req, res) => {
     const sql = `UPDATE entries SET ? WHERE id = ?`;
-    const query = db.query(sql, [req.body, req.params.id], (err, result) => {
+    const query = pool.query(sql, [req.body, req.params.id], (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
@@ -128,7 +123,7 @@ app.post('/api/entries/id/:id', (req, res) => {
 
 app.delete('/api/entries/id/:id', (req, res) => {
     const sql = `DELETE FROM entries WHERE id = ?`;
-    const query = db.query(sql, req.params.id, (err, result) => {
+    const query = pool.query(sql, req.params.id, (err, result) => {
         if (err) {
             return res.status(400).send({
                 error: { error_num: err.errno, error_code: err.code },
